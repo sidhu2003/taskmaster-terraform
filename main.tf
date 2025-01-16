@@ -7,7 +7,7 @@ data "aws_availability_zones" "available" {
 }
 
 locals {
-  prefix = "${var.app_name}-${var.environment}"
+  prefix = "${var.app_name}"
 }
 
 # VPC
@@ -135,17 +135,29 @@ resource "aws_lb_target_group" "app" {
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
 
-  health_check {
-    path                = "/api/tasks"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
-  }
+#   health_check {
+#     path                = "/api/tasks"
+#     interval            = 30
+#     timeout             = 5
+#     healthy_threshold   = 3
+#     unhealthy_threshold = 3
+#   }
+
 
   tags = {
     Name        = "${local.prefix}-target-group"
     Environment = var.environment
+  }
+}
+
+resource "aws_lb_listener" "main" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app.arn
   }
 }
 
@@ -286,6 +298,8 @@ resource "aws_ecs_service" "app" {
     assign_public_ip = false
   }
 
+  depends_on = [aws_lb_listener.main]
+
   load_balancer {
     target_group_arn = aws_lb_target_group.app.arn
     container_name   = var.app_name
@@ -359,7 +373,7 @@ resource "aws_db_instance" "main" {
 
 # AWS Secrets Manager
 resource "aws_secretsmanager_secret" "db_password" {
-  name = "${local.prefix}-db-pass-1234"
+  name = "${local.prefix}-db-pass-123"
 
   tags = {
     Name        = "${local.prefix}-db-password"
