@@ -1,74 +1,61 @@
 variable "aws_region" {
-  type    = string
-  default = "ap-south-2"
-}
-
-variable "environment" {
-  type    = string
-  default = "prod"
+  type        = string
+  default     = "ap-south-1"
 }
 
 variable "vpc_cidr" {
-  type    = string
-  default = "10.0.0.0/16"
+  type        = string
+  default     = "10.0.0.0/16"
 }
 
-variable "app_name" {
-  type    = string
-  default = "taskmaster"
+variable "public_subnet_cidrs" {
+  type        = map(string)
+  default = {
+    "ap-south-1a" = "10.0.1.0/24"
+    "ap-south-1b" = "10.0.2.0/24"
+  }
 }
 
 variable "container_port" {
-  type    = number
-  default = 8080
+  type        = number
+  default     = 8080
 }
 
-variable "desired_count" {
-  type    = number
-  default = 1
+variable "app_name" {
+  type        = string
+  default     = "my-app"
 }
 
-variable "fargate_cpu" {
-  type    = number
-  default = 1024
+variable "environment" {
+  type        = string
+  default     = "prod"
 }
 
-variable "fargate_memory" {
-  type    = number
-  default = 2048
+variable "ecs_task_cpu" {
+  type        = number
+  default     = 1024
 }
 
-variable "enable_container_insights" {
-  type    = bool
-  default = true
+variable "ecs_task_memory" {
+  type        = number
+  default     = 2048
 }
 
-variable "db_name" {
-  type    = string
-  default = "myapp"
+variable "ecs_task_desired_count" {
+  type        = number
+  default     = 1
 }
 
-variable "db_username" {
-  type    = string
-  default = "task"
+variable "log_retention_days" {
+  type        = number
+  default     = 30
 }
 
 variable "db_password" {
-  type      = string
   sensitive = true
 }
 
-variable "db_platform" {
-  type    = string
-  default = "org.hibernate.dialect.PostgreSQLDialect"
-}
-
-variable "db_instance_class" {
-  type    = string
-  default = "db.t3.micro"
-}
-
-variable "db_allocated_storage" {
-  type    = number
-  default = 20
+variable "db_port" {
+  type        = number
+  default     = 16584
 }
