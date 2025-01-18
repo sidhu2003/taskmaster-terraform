@@ -74,7 +74,7 @@ resource "aws_route_table_association" "public_2" {
 }
 
 resource "aws_secretsmanager_secret" "db_password" {
-  name = "${var.app_name}-db-password-quiop"
+  name = "${var.app_name}-db-password-12345"
   
   tags = {
     Name        = "${var.app_name}-db-password"
@@ -159,7 +159,6 @@ resource "aws_vpc_endpoint" "secretsmanager" {
 # Security Group for VPC Endpoints
 resource "aws_security_group" "vpc_endpoints" {
   name        = "${var.app_name}-vpc-endpoints-sg"
-  description = "Security group for VPC endpoints"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -185,11 +184,9 @@ resource "aws_security_group" "vpc_endpoints" {
 # Security Groups
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.app_name}-ecs-tasks-sg"
-  description = "Allow inbound traffic for ECS tasks"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "Allow container port"
     from_port   = var.container_port
     to_port     = var.container_port
     protocol    = "tcp"
@@ -197,7 +194,6 @@ resource "aws_security_group" "ecs_tasks" {
   }
 
   ingress {
-    description = "Allow DB port"
     from_port   = var.db_port
     to_port     = var.db_port
     protocol    = "tcp"
@@ -219,11 +215,9 @@ resource "aws_security_group" "ecs_tasks" {
 
 resource "aws_security_group" "alb" {
   name        = "${var.app_name}-alb-sg"
-  description = "Allow inbound traffic for ALB"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "Allow HTTP"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -231,7 +225,6 @@ resource "aws_security_group" "alb" {
   }
 
   ingress {
-    description = "Allow HTTPS"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -340,11 +333,11 @@ resource "aws_lb_target_group" "app" {
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
 
-  # health_check {
-  #   path                = "/"
-  #   healthy_threshold   = 2
-  #   unhealthy_threshold = 10
-  # }
+  health_check {
+    path                = "/api/tasks"
+    healthy_threshold   = 2
+    unhealthy_threshold = 10
+  }
 
   tags = {
     Name        = "${var.app_name}-tg"

@@ -23,7 +23,7 @@ variable "container_port" {
 
 variable "app_name" {
   type        = string
-  default     = "my-app"
+  default     = "taskmaster"
 }
 
 variable "environment" {
@@ -48,7 +48,7 @@ variable "ecs_task_desired_count" {
 
 variable "log_retention_days" {
   type        = number
-  default     = 30
+  default     = 7
 }
 
 variable "db_password" {
